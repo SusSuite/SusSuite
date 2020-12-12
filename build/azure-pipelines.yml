@@ -44,7 +44,7 @@ steps:
   - task: CopyFiles@2
     inputs:
       Contents: '**/Release/net5.0/SusSuite.Core.dll'
-      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)/SusSuite'
       flattenFolders: true
   - task: NuGetCommand@2
     displayName: nuget push
@@ -55,5 +55,5 @@ steps:
       publishFeedCredentials: 'Nuget Connection'
       allowPackageConflicts: true
 
-  - publish: '$(Build.ArtifactStagingDirectory)'
+  - publish: '$(Build.ArtifactStagingDirectory)/SusSuite'
     artifact: SusSuite
