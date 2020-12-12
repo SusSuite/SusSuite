@@ -9,6 +9,9 @@ trigger:
 pool:
   vmImage: 'windows-latest'
 
+variables: 
+- group: 'SusSuite'
+
 steps:
   - task: UseDotNet@2
     inputs:
@@ -46,22 +49,7 @@ steps:
       Contents: '**/Release/net5.0/SusSuite.Core.dll'
       TargetFolder: '$(Build.ArtifactStagingDirectory)/SusSuite'
       flattenFolders: true
-  
-  # - task: NuGetAuthenticate@0
-  #   inputs:
-  #     nuGetServiceConnections: 'Nuget Connection'
-  - task: DotNetCoreCLI@2
-    inputs:
-      command: 'custom'
-      custom: 'nuget push "$(Build.ArtifactStagingDirectory)/*.nupkg" --api-key AzureArtifacts --source https://api.nuget.org/v3/index.json --skip-duplicate'
-  - task: NuGetCommand@2
-    displayName: nuget push
-    inputs:
-      command: 'push'
-      packagesToPush: '$(Build.ArtifactStagingDirectory)/nuget/*.nupkg;!$(Build.ArtifactStagingDirectory)/nuget/*.symbols.nupkg'
-      nuGetFeedType: 'external'
-      publishFeedCredentials: 'Nuget Connection'
-      allowPackageConflicts: true
-
+      
+  - pwsh: nuget push "$(Build.ArtifactStagingDirectory)/*.nupkg" --api-key $(NugetApiKey) --source https://api.nuget.org/v3/index.json --skip-duplicate'
   - publish: '$(Build.ArtifactStagingDirectory)/SusSuite'
     artifact: SusSuite
