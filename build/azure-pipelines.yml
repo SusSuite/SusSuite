@@ -50,6 +50,8 @@ steps:
       TargetFolder: '$(Build.ArtifactStagingDirectory)/SusSuite'
       flattenFolders: true
       
-  - script: dotnet nuget push "$(Build.ArtifactStagingDirectory)/*.nupkg" --api-key $(NugetApiKey) --source "https://api.nuget.org/v3/index.json" --skip-duplicate'
+  - script: dotnet nuget push "*.nupkg" --api-key $(NugetApiKey) --source "https://api.nuget.org/v3/index.json" --skip-duplicate'
+    displayName: dotnet nuget push
+    workingDirectory: $(Build.ArtifactStagingDirectory)
   - publish: '$(Build.ArtifactStagingDirectory)/SusSuite'
     artifact: SusSuite
