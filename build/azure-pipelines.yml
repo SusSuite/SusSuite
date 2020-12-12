@@ -1,0 +1,36 @@
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    exclude:
+    - build/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'restore'
+      projects: '**/*.sln'
+      arguments: '--configuration Release'
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'build'
+      projects: '**/*.sln'
+      arguments: '--configuration Release --no-restore'
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'test'
+      projects: '**/*.Tests.csproj'
+      arguments: '--configuration Release'
+  
+  - task: CopyFiles@2
+    inputs:
+      Contents: '**/Release/net5.0/SusSuite.Core.dll'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+      flattenFolders: true
+
+  - publish: '$(Build.ArtifactStagingDirectory)'
+    artifact: SusSuite
