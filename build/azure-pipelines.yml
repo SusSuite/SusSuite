@@ -36,6 +36,7 @@ steps:
       projects: '**/*.Tests.csproj'
       arguments: '--configuration Release'
   - task: DotNetCoreCLI@2
+    displayName: dotnet pack
     inputs:
       command: 'pack'
       packagesToPack: '**/*.csproj'
@@ -53,5 +54,6 @@ steps:
   - script: dotnet nuget push "*.nupkg" --api-key $(NugetApiKey) --source "https://api.nuget.org/v3/index.json" --skip-duplicate
     displayName: dotnet nuget push
     workingDirectory: $(Build.ArtifactStagingDirectory)/nuget
+
   - publish: '$(Build.ArtifactStagingDirectory)/SusSuite'
     artifact: SusSuite
