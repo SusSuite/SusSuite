@@ -16,9 +16,9 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
-Your plugin class needs to include:
+Your plugin class needs to include a plugin name for full functionality:
 ```csharp
-public ExamplePLugin(ISusSuiteCore susSuiteCore)
+public ExamplePlugin(ISusSuiteCore susSuiteCore)
 {
     susSuiteCore.PluginName = "ExamplePlugin";
 }
@@ -26,10 +26,19 @@ public ExamplePLugin(ISusSuiteCore susSuiteCore)
 
 ## How to Use
 
+Since SusSuite is dependency injected, it can be used in all your classes:
+```csharp
+private readonly ISusSuiteCore _susSuite;
+public ExampleClass(ISusSuiteCore susSuiteCore)
+{
+    _susSuiteCore = susSuiteCore;
+}
+```
+
 ### Logging
 SusSuite provides a logging wrapper to provide better logging.
 ```csharp
-susSuiteCore.Logger.LogInformation("Log Stuff");
+_susSuiteCore.Logger.LogInformation("Log Stuff");
 ```
 This will log:
 >  SusSuite => ExamplePlugin => Log Stuff
@@ -41,7 +50,7 @@ The file will be located at:
 > \plugins\ExamplePlugin\ExampleSettings.json
 
 ```csharp
-var settings = susSuiteCore.ConfigService.GetConfig<ExampleSettings>("ExampleSettings");
+var settings = _susSuiteCore.ConfigService.GetConfig<ExampleSettings>("ExampleSettings");
 ```
 
 The config can be edited and will take affect on a server restart.
