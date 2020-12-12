@@ -25,12 +25,22 @@ steps:
       command: 'test'
       projects: '**/*.Tests.csproj'
       arguments: '--configuration Release'
-  
   - task: CopyFiles@2
     inputs:
       Contents: '**/Release/net5.0/SusSuite.Core.dll'
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
       flattenFolders: true
+  - task: CopyFiles@2
+    inputs:
+      Contents: '**/Release/*.nupkg;**/Release/*.symbols.nupkg'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)/nuget'
+      flattenFolders: true
+  - task: NuGetCommand@2
+    inputs:
+      command: 'push'
+      packagesToPush: '$(Build.ArtifactStagingDirectory)/nuget/*.nupkg;!$(Build.ArtifactStagingDirectory)/nuget/*.symbols.nupkg'
+      nuGetFeedType: 'external'
+      publishFeedCredentials: 'Nuget Connection'
 
   - publish: '$(Build.ArtifactStagingDirectory)'
     artifact: SusSuite
