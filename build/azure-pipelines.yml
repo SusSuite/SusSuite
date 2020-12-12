@@ -7,7 +7,7 @@ trigger:
     - build/*
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'windows-latest'
 
 steps:
   - task: UseDotNet@2
@@ -53,6 +53,7 @@ steps:
       packagesToPush: '$(Build.ArtifactStagingDirectory)/nuget/*.nupkg;!$(Build.ArtifactStagingDirectory)/nuget/*.symbols.nupkg'
       nuGetFeedType: 'external'
       publishFeedCredentials: 'Nuget Connection'
+      allowPackageConflicts: true
 
   - publish: '$(Build.ArtifactStagingDirectory)'
     artifact: SusSuite
