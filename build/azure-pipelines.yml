@@ -15,16 +15,19 @@ steps:
       packageType: 'sdk'
       version: '5.x'
   - task: DotNetCoreCLI@2
+    displayName: dotnet restore
     inputs:
       command: 'restore'
       projects: '**/*.sln'
       arguments: '--configuration Release'
   - task: DotNetCoreCLI@2
+    displayName: dotnet build
     inputs:
       command: 'build'
       projects: '**/*.sln'
       arguments: '--configuration Release --no-restore'
   - task: DotNetCoreCLI@2
+    displayName: dotnet test
     inputs:
       command: 'test'
       projects: '**/*.Tests.csproj'
@@ -40,6 +43,7 @@ steps:
       TargetFolder: '$(Build.ArtifactStagingDirectory)/nuget'
       flattenFolders: true
   - task: NuGetCommand@2
+    displayName: nuget push
     inputs:
       command: 'push'
       packagesToPush: '$(Build.ArtifactStagingDirectory)/nuget/*.nupkg;!$(Build.ArtifactStagingDirectory)/nuget/*.symbols.nupkg'
