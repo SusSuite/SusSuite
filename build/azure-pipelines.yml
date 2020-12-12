@@ -46,6 +46,13 @@ steps:
       Contents: '**/Release/net5.0/SusSuite.Core.dll'
       TargetFolder: '$(Build.ArtifactStagingDirectory)/SusSuite'
       flattenFolders: true
+  - task: NuGetAuthenticate@0
+    inputs:
+      nuGetServiceConnections: 'Nuget Connection'
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'custom'
+      custom: 'nuget push "$(Build.ArtifactStagingDirectory)/*.nupkg" -ApiKey AzureArtifacts -s https://api.nuget.org/v3/index.json --skip-duplicate'
   - task: NuGetCommand@2
     displayName: nuget push
     inputs:
