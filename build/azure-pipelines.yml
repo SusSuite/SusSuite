@@ -32,15 +32,19 @@ steps:
       command: 'test'
       projects: '**/*.Tests.csproj'
       arguments: '--configuration Release'
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'pack'
+      packagesToPack: '**/*.csproj'
+      configuration: 'Release'
+      nobuild: true
+      includesymbols: true
+      versioningScheme: 'off'
+      packDirectory: '$(Build.ArtifactStagingDirectory)/nuget'
   - task: CopyFiles@2
     inputs:
       Contents: '**/Release/net5.0/SusSuite.Core.dll'
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
-      flattenFolders: true
-  - task: CopyFiles@2
-    inputs:
-      Contents: '**/Release/*.nupkg;**/Release/*.symbols.nupkg'
-      TargetFolder: '$(Build.ArtifactStagingDirectory)/nuget'
       flattenFolders: true
   - task: NuGetCommand@2
     displayName: nuget push
