@@ -1,0 +1,59 @@
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    exclude:
+    - build/*
+
+pool:
+  vmImage: 'windows-latest'
+
+variables: 
+- group: 'SusSuite'
+
+steps:
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'sdk'
+      version: '5.x'
+  - task: DotNetCoreCLI@2
+    displayName: dotnet restore
+    inputs:
+      command: 'restore'
+      projects: '**/*.sln'
+      arguments: '--configuration Release'
+  - task: DotNetCoreCLI@2
+    displayName: dotnet build
+    inputs:
+      command: 'build'
+      projects: '**/*.sln'
+      arguments: '--configuration Release --no-restore'
+  - task: DotNetCoreCLI@2
+    displayName: dotnet test
+    inputs:
+      command: 'test'
+      projects: '**/*.Tests.csproj'
+      arguments: '--configuration Release'
+  - task: DotNetCoreCLI@2
+    displayName: dotnet pack
+    inputs:
+      command: 'pack'
+      packagesToPack: '**/*.csproj'
+      configuration: 'Release'
+      nobuild: true
+      includesymbols: true
+      versioningScheme: 'off'
+      packDirectory: '$(Build.ArtifactStagingDirectory)/nuget'
+  - task: CopyFiles@2
+    inputs:
+      Contents: '**/Release/net5.0/SusSuite.Core.dll'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)/SusSuite'
+      flattenFolders: true
+      
+  - script: dotnet nuget push "*.nupkg" --api-key $(NugetApiKey) --source "https://api.nuget.org/v3/index.json" --skip-duplicate
+    displayName: dotnet nuget push
+    workingDirectory: $(Build.ArtifactStagingDirectory)/nuget
+
+  - publish: '$(Build.ArtifactStagingDirectory)/SusSuite'
+    artifact: SusSuite
