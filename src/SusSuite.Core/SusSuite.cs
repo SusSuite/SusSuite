@@ -7,10 +7,23 @@ using SusSuite.Core.Services;
 
 namespace SusSuite.Core
 {
-    public class SusSuiteCore : ISusSuiteCore
+    public abstract class SusSuiteCore : ISusSuiteCore
     {
         public ILoggerService Logger { get; set; }
         public IConfigService ConfigService { get; set; }
+        private LogLevel _configServiceDefaultLogLevel;
+        public LogLevel ConfigServiceDefaultLogLevel 
+        {
+            get
+            {
+                return _configServiceDefaultLogLevel;
+            }
+            set
+            {
+                _configServiceDefaultLogLevel = value;
+                ConfigService.DefaultLogLevel = value;
+            }
+        }
 
         public string _pluginName;
         public string PluginName
@@ -27,10 +40,11 @@ namespace SusSuite.Core
         public SusSuiteCore(ILogger<SusSuiteCore> logger, JsonSerializerOptions jsonSerializerOptions)
         {
             Logger = new LoggerService(logger);
-            ConfigService = new ConfigService(Logger, jsonSerializerOptions);
+            ConfigService = new ConfigService(Logger, jsonSerializerOptions, ConfigServiceDefaultLogLevel);
 
             PluginName = "DEFAULT_PLUGIN_NAME";
         }
 
     }
+
 }

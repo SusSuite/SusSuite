@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -8,14 +9,17 @@ namespace SusSuite.Core.Services
 {
     public class ConfigService : IConfigService
     {
-        private readonly JsonSerializerOptions _jsonSerializerOptions;
         public string PluginName { get; set; }
+        public LogLevel DefaultLogLevel { get; set; }
 
+        private readonly JsonSerializerOptions _jsonSerializerOptions;
         private readonly ILoggerService _loggerService;
-        public ConfigService(ILoggerService loggerService, JsonSerializerOptions jsonSerializerOptions)
+
+        public ConfigService(ILoggerService loggerService, JsonSerializerOptions jsonSerializerOptions, LogLevel defaultLogLevel)
         {
             _loggerService = loggerService;
             _jsonSerializerOptions = jsonSerializerOptions;
+            DefaultLogLevel = defaultLogLevel;
         }
 
         public bool TryGetDataFolder(out DirectoryInfo directoryInfo)
@@ -71,6 +75,11 @@ namespace SusSuite.Core.Services
             }
         }
 
+        public T GetConfig<T>() where T : new()
+        {
+            return GetConfig<T>(PluginName);
+        }
+
         private bool TryCreateDirectory(DirectoryInfo directoryInfo, out DirectoryInfo directory)
         {
             try
@@ -80,6 +89,7 @@ namespace SusSuite.Core.Services
             }
             catch (Exception ex)
             {
+                _loggerService.LogWarning(ex, "Could not create data folder.");
                 directory = null;
                 return false;
             }
@@ -90,7 +100,7 @@ namespace SusSuite.Core.Services
             config = new T();
             try
             {
-                _loggerService.LogDebug($"Creating config file: {fileInfo.FullName}");
+                _loggerService.Log(DefaultLogLevel, $"Creating config file: {fileInfo.FullName}");
                 fileInfo.Directory.Create();
                 File.WriteAllText(fileInfo.FullName, JsonSerializer.Serialize(config, _jsonSerializerOptions));
                 File.WriteAllText(fileInfo.FullName, JsonSerializer.Serialize(config));
@@ -109,7 +119,7 @@ namespace SusSuite.Core.Services
             var brokenFileFullName = Path.Combine(fileInfo.Directory.FullName, brokenFileName);
             try
             {
-                _loggerService.LogDebug($"Config file broken, saving copy at {brokenFileFullName}");
+                _loggerService.Log(DefaultLogLevel, $"Config file broken, saving copy at {brokenFileFullName}");
                 fileInfo.CopyTo(brokenFileFullName, true);
                 return true;
             }
@@ -122,7 +132,7 @@ namespace SusSuite.Core.Services
 
         private bool TryReadFile<T>(FileInfo fileInfo, out T config)
         {
-            _loggerService.LogDebug($"Reading Config File: {fileInfo.FullName}");
+            _loggerService.Log(DefaultLogLevel, $"Reading Config File: {fileInfo.FullName}");
             try
             {
                 using (StreamReader r = new StreamReader(fileInfo.FullName))
