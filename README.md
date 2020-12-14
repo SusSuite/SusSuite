@@ -3,6 +3,7 @@
 SusSuite is a library to help write Impostor plugins.
 
 [![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/SusSuite.Core)](https://www.nuget.org/packages/SusSuite.Core/)
+[![Build Status](https://dev.azure.com/steinhoff/SusSuite/_apis/build/status/SusSuite.SusSuite?branchName=master)](https://dev.azure.com/steinhoff/SusSuite/_build/latest?definitionId=7&branchName=master)
 
 ## Setup
 
