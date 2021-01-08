@@ -1,29 +1,30 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
+using SusSuite.Core.Models;
 
-namespace SusSuite.Core.Services
+namespace SusSuite.Core.Services.Logger
 {
-    public class LoggerService : ILoggerService
+    public class LoggerService
     {
-        public string PluginName { get; set; }
-
-        private readonly string _ID = "SusSuite";
+        private const string Id = "SusSuite";
         private readonly ILogger _logger;
+        private readonly SusSuitePlugin _plugin;
 
-        public LoggerService(ILogger logger)
+        public LoggerService(ILogger logger, SusSuitePlugin susSuitePlugin)
         {
             _logger = logger;
+            _plugin = susSuitePlugin;
         }
 
         private string MakeMessage(string message)
         {
-            return "{_ID} => {_plugin} => " + message;
+            return "{Id} => {_pluginName} => " + message;
         }
         private object[] MakeArgs(params object[] args)
         {
             var newArgs = new object[args.Length + 2];
-            newArgs[0] = _ID;
-            newArgs[1] = PluginName;
+            newArgs[0] = Id;
+            newArgs[1] = _plugin.Name;
             args.CopyTo(newArgs, 2);
             return newArgs;
         }

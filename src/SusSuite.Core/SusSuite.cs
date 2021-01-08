@@ -1,50 +1,61 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.Json;
+﻿using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using SusSuite.Core.Services;
+using SusSuite.Core.Models;
+using SusSuite.Core.Services.Config;
+using SusSuite.Core.Services.Logger;
+using SusSuite.Core.Services.PluginManager;
+using SusSuite.Core.Services.PluginService;
 
 namespace SusSuite.Core
 {
-    public abstract class SusSuiteCore : ISusSuiteCore
+    public class SusSuiteManager
     {
-        public ILoggerService Logger { get; set; }
-        public IConfigService ConfigService { get; set; }
-        private LogLevel _configServiceDefaultLogLevel;
-        public LogLevel ConfigServiceDefaultLogLevel 
+        public PluginManager PluginManager { get; }
+        private LoggerService LoggerService { get; }
+        private ILogger<SusSuiteCore> Logger { get; }
+        internal SusSuiteCore SusSuiteCore { get; }
+        internal SusSuitePlugin ServerPlugin { get; }
+
+        public SusSuiteManager(ILogger<SusSuiteCore> logger)
         {
-            get
+            var susPlugin = new SusSuitePlugin()
             {
-                return _configServiceDefaultLogLevel;
-            }
-            set
+                Name = "SusSuite"
+            };
+
+            Logger = logger;
+            LoggerService = new LoggerService(logger, susPlugin);
+            PluginManager = new PluginManager(LoggerService);
+            SusSuiteCore = GetSusSuiteCore(susPlugin);
+
+            var validation = new JsonSerializerOptions();
+            validation.Converters.Add(new SusSuiteConfigPropertyConverter());
+
+            var serverConfig = SusSuiteCore.ConfigService.GetConfig<SusSuiteConfig>("SusSuiteServer", validation);
+            ServerPlugin = new SusSuitePlugin()
             {
-                _configServiceDefaultLogLevel = value;
-                ConfigService.DefaultLogLevel = value;
-            }
+                Name = serverConfig.ServerName,
+                PluginColor = serverConfig.ServerColor
+            };
         }
 
-        public string _pluginName;
-        public string PluginName
+        public SusSuiteCore GetSusSuiteCore(SusSuitePlugin susSuitePlugin)
         {
-            get => _pluginName;
-            set
-            {
-                _pluginName = value;
-                Logger.PluginName = value;
-                ConfigService.PluginName = value;
-            }
+            return new SusSuiteCore(Logger, susSuitePlugin);
         }
-
-        public SusSuiteCore(ILogger<SusSuiteCore> logger, JsonSerializerOptions jsonSerializerOptions)
-        {
-            Logger = new LoggerService(logger);
-            ConfigService = new ConfigService(Logger, jsonSerializerOptions, ConfigServiceDefaultLogLevel);
-
-            PluginName = "DEFAULT_PLUGIN_NAME";
-        }
-
     }
 
+    public class SusSuiteCore
+    {
+        public PluginService PluginService { get; }
+        public ConfigService ConfigService { get; }
+        public LoggerService LoggerService { get; }
+
+        public SusSuiteCore(ILogger<SusSuiteCore> logger, SusSuitePlugin susSuitePlugin)
+        {
+            LoggerService = new LoggerService(logger, susSuitePlugin);
+            ConfigService = new ConfigService(LoggerService, susSuitePlugin);
+            PluginService = new PluginService(susSuitePlugin);
+        }
+    }
 }

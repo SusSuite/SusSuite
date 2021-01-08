@@ -1,86 +1,85 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Diagnostics;
+﻿using System;
 using System.IO;
-using System.Reflection;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
+using SusSuite.Core.Models;
+using SusSuite.Core.Services.Logger;
 
-namespace SusSuite.Core.Services
+namespace SusSuite.Core.Services.Config
 {
-    public class ConfigService : IConfigService
+    public class ConfigService
     {
-        public string PluginName { get; set; }
-        public LogLevel DefaultLogLevel { get; set; }
+        private readonly LoggerService _loggerService;
+        private readonly SusSuitePlugin _plugin;
 
-        private readonly JsonSerializerOptions _jsonSerializerOptions;
-        private readonly ILoggerService _loggerService;
-
-        public ConfigService(ILoggerService loggerService, JsonSerializerOptions jsonSerializerOptions, LogLevel defaultLogLevel)
+        public ConfigService(LoggerService loggerService, SusSuitePlugin plugin)
         {
             _loggerService = loggerService;
-            _jsonSerializerOptions = jsonSerializerOptions;
-            DefaultLogLevel = defaultLogLevel;
+            _plugin = plugin;
         }
 
         public bool TryGetDataFolder(out DirectoryInfo directoryInfo)
         {
-            directoryInfo = new DirectoryInfo(Path.Combine(Environment.CurrentDirectory, "plugins", PluginName));
+            directoryInfo = new DirectoryInfo(Path.Combine(Environment.CurrentDirectory, "plugins", _plugin.Name));
             if (directoryInfo.Exists)
             {
                 return true;
             }
+
+            if (TryCreateDirectory(directoryInfo, out var directory))
+            {
+                directoryInfo = directory;
+                return true;
+            }
+
+            directoryInfo = null;
+            return false;
+        }
+
+        public T GetConfig<T>(string fileName, JsonSerializerOptions jsonSerializerOptions = null) where T : new()
+        {
+            if (!TryGetDataFolder(out var directoryInfo)) return new T();
+
+            var file = new FileInfo(Path.Combine(directoryInfo.FullName, fileName + ".json"));
+
+            if (file.Exists)
+            {
+                jsonSerializerOptions ??= new JsonSerializerOptions();
+                if (TryReadFile(file, jsonSerializerOptions, out T userConfig))
+                {
+                    _loggerService.LogDebug("Read config file");
+                    return userConfig;
+                }
+
+                if (TryCreateBrokenFile(file))
+                {
+                    _loggerService.LogDebug($"Config file broken, saving copy at {file.Name}");
+                }
+
+                if (TryCreateFile(file, jsonSerializerOptions, out T defaultConfig))
+                {
+                    _loggerService.LogDebug("Returning Default Config.");
+                }
+
+                return defaultConfig;
+            }
             else
             {
-                if (TryCreateDirectory(directoryInfo, out var directory))
+                if (TryCreateFile(file, jsonSerializerOptions, out T defaultConfig))
                 {
-                    directoryInfo = directory;
-                    return true;
+                    _loggerService.LogDebug("Creating config file");
                 }
-                else
-                {
-                    directoryInfo = null;
-                    return false;
-                }
+                return defaultConfig;
             }
+
         }
 
-        public T GetConfig<T>(string fileName) where T : new()
+        public T GetConfig<T>(JsonSerializerOptions jsonSerializerOptions = null) where T : new()
         {
-            if (TryGetDataFolder(out var directoryInfo))
-            {
-                FileInfo file = new FileInfo(Path.Combine(directoryInfo.FullName, fileName + ".json"));
-
-                if (file.Exists)
-                {
-                    if (TryReadFile(file, out T userConfig))
-                    {
-                        return userConfig;
-                    }
-                    else
-                    {
-                        TryCreateBrokenFile(file);
-                        TryCreateFile(file, out T defaultConfig);
-                        return defaultConfig;
-                    }
-                }
-                else
-                {
-                    TryCreateFile(file, out T defaultConfig);
-                    return defaultConfig;
-                }
-            }
-            else
-            {
-                return new T();
-            }
+            return GetConfig<T>(_plugin.Name, jsonSerializerOptions);
         }
 
-        public T GetConfig<T>() where T : new()
-        {
-            return GetConfig<T>(PluginName);
-        }
-
-        private bool TryCreateDirectory(DirectoryInfo directoryInfo, out DirectoryInfo directory)
+        private bool TryCreateDirectory(FileSystemInfo directoryInfo, out DirectoryInfo directory)
         {
             try
             {
@@ -95,15 +94,13 @@ namespace SusSuite.Core.Services
             }
         }
 
-        private bool TryCreateFile<T>(FileInfo fileInfo, out T config) where T : new()
+        private bool TryCreateFile<T>(FileInfo fileInfo, JsonSerializerOptions jsonSerializerOptions, out T config) where T : new()
         {
             config = new T();
             try
             {
-                _loggerService.Log(DefaultLogLevel, $"Creating config file: {fileInfo.FullName}");
-                fileInfo.Directory.Create();
-                File.WriteAllText(fileInfo.FullName, JsonSerializer.Serialize(config, _jsonSerializerOptions));
-                File.WriteAllText(fileInfo.FullName, JsonSerializer.Serialize(config));
+                fileInfo.Directory?.Create();
+                File.WriteAllText(fileInfo.FullName, JsonSerializer.Serialize(config,jsonSerializerOptions));
                 return true;
             }
             catch (Exception ex)
@@ -115,11 +112,11 @@ namespace SusSuite.Core.Services
 
         private bool TryCreateBrokenFile(FileInfo fileInfo)
         {
-            var brokenFileName = $"{Path.GetFileNameWithoutExtension(fileInfo.Name)}-{DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss-tt")}.broken.json";
+            var brokenFileName = $"{Path.GetFileNameWithoutExtension(fileInfo.Name)}-{DateTime.Now:yyyy-MM-dd_hh-mm-ss-tt}.broken.json";
+            if (fileInfo.Directory == null) return false;
             var brokenFileFullName = Path.Combine(fileInfo.Directory.FullName, brokenFileName);
             try
             {
-                _loggerService.Log(DefaultLogLevel, $"Config file broken, saving copy at {brokenFileFullName}");
                 fileInfo.CopyTo(brokenFileFullName, true);
                 return true;
             }
@@ -130,18 +127,14 @@ namespace SusSuite.Core.Services
             }
         }
 
-        private bool TryReadFile<T>(FileInfo fileInfo, out T config)
+        private bool TryReadFile<T>(FileSystemInfo fileInfo, JsonSerializerOptions jsonSerializerOptions, out T config)
         {
-            _loggerService.Log(DefaultLogLevel, $"Reading Config File: {fileInfo.FullName}");
             try
             {
-                using (StreamReader r = new StreamReader(fileInfo.FullName))
-                {
-                    string json = r.ReadToEnd();
-                    config = JsonSerializer.Deserialize<T>(json, _jsonSerializerOptions);
-                    config = JsonSerializer.Deserialize<T>(json);
-                    return true;
-                }
+                using var r = new StreamReader(fileInfo.FullName);
+                var json = r.ReadToEnd();
+                config = JsonSerializer.Deserialize<T>(json, jsonSerializerOptions);
+                return true;
             }
             catch (Exception ex)
             {
