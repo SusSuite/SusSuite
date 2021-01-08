@@ -39,7 +39,7 @@ steps:
     displayName: dotnet pack
     inputs:
       command: 'pack'
-      packagesToPack: '**/*.csproj'
+      packagesToPack: '**/SusSuite.Core.csproj'
       configuration: 'Release'
       nobuild: true
       includesymbols: true
