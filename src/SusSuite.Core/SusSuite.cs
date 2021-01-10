@@ -41,7 +41,7 @@ namespace SusSuite.Core
 
         public SusSuiteCore GetSusSuiteCore(SusSuitePlugin susSuitePlugin)
         {
-            return new SusSuiteCore(Logger, susSuitePlugin);
+            return new SusSuiteCore(Logger, susSuitePlugin, this);
         }
     }
 
@@ -51,11 +51,11 @@ namespace SusSuite.Core
         public ConfigService ConfigService { get; }
         public LoggerService LoggerService { get; }
 
-        public SusSuiteCore(ILogger<SusSuiteCore> logger, SusSuitePlugin susSuitePlugin)
+        public SusSuiteCore(ILogger<SusSuiteCore> logger, SusSuitePlugin susSuitePlugin, SusSuiteManager susSuiteManager)
         {
             LoggerService = new LoggerService(logger, susSuitePlugin);
             ConfigService = new ConfigService(LoggerService, susSuitePlugin);
-            PluginService = new PluginService(susSuitePlugin);
+            PluginService = new PluginService(susSuitePlugin, susSuiteManager);
         }
     }
 }

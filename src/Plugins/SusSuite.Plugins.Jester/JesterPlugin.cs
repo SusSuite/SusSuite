@@ -8,7 +8,7 @@ using SusSuite.Core.Models;
 
 namespace SusSuite.Plugins.Jester
 {
-   public  class JesterPluginStartup : IPluginStartup
+    public class JesterPluginStartup : IPluginStartup
     {
         public void ConfigureHost(IHostBuilder host)
         {
@@ -24,7 +24,9 @@ namespace SusSuite.Plugins.Jester
         name: "Jester",
         package: "SusSuite.Plugins",
         author: "Gavin Steinhoff",
-        version: "1.0.0")]
+        version: "1.0.0"
+    )]
+
     public class JesterPlugin : PluginBase
     {
         private readonly SusSuiteManager _susSuiteManager;

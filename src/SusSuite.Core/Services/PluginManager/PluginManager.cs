@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using Impostor.Api.Games;
 using Microsoft.Extensions.Logging;
 using SusSuite.Core.Models;
 using SusSuite.Core.Services.Config;
@@ -14,7 +15,6 @@ namespace SusSuite.Core.Services.PluginManager
         public List<SusSuitePlugin> SusSuitePlugins { get; } = new();
         public List<SusSuiteGame> SusSuiteGames { get; } = new();
         public LoggerService LoggerService { get; }
-
 
         public PluginManager(LoggerService loggerService)
         {
@@ -68,7 +68,6 @@ namespace SusSuite.Core.Services.PluginManager
             if (TryGetGame(gameCode, out var susSuiteGame))
             {
                 susSuiteGame.SusSuitePlugin = susSuitePlugin;
-                susSuiteGame.SetData<SusSuiteGame>(null);
             }
             else
             {
@@ -133,9 +132,9 @@ namespace SusSuite.Core.Services.PluginManager
             return game;
         }
 
-        public bool IsGameModeEnabled(SusSuitePlugin susSuitePlugin, string gameCode)
+        public bool IsGameModeEnabled(SusSuitePlugin susSuitePlugin, IGame game)
         {
-            if (TryGetGame(gameCode, out var susSuiteGame))
+            if (TryGetGame(game.Code, out var susSuiteGame))
             {
                 return susSuiteGame.SusSuitePlugin == susSuitePlugin;
             }

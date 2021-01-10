@@ -9,28 +9,16 @@ namespace SusSuite.Core.Models
     {
         public string ServerName { get; set; }
         public string ServerColor { get; set; }
-        [JsonIgnore]
-        public string FormattedServerName => ServerColor + ServerName + "[]";
     }
 
     public class SusSuiteConfigPropertyConverter : JsonConverter<SusSuiteConfig>
     {
-        public override SusSuiteConfig Read(
-            ref Utf8JsonReader reader,
-            Type type,
-            JsonSerializerOptions options)
+        public override SusSuiteConfig Read(ref Utf8JsonReader reader, Type type, JsonSerializerOptions options)
         {
-
             // Don't pass in options when recursively calling Deserialize.
             var susSuiteConfig = JsonSerializer.Deserialize<SusSuiteConfig>(ref reader);
 
             var rx = new Regex(@"\[[0-9a-fA-F]{8}\]");
-
-            if (susSuiteConfig == null)
-            {
-                throw new JsonException("Config was null.");
-            }
-            
 
             if (!rx.IsMatch(susSuiteConfig.ServerColor)) throw new JsonException("ServerColor is not in proper format.");
 

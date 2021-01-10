@@ -2,9 +2,6 @@
 using Impostor.Api.Events;
 using Impostor.Api.Events.Player;
 using Impostor.Api.Innersloth;
-using SusSuite.Core.Models;
-
-// ReSharper disable UnusedMember.Global
 
 namespace SusSuite.Core.Plugin
 {

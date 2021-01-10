@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,18 +7,47 @@ using Impostor.Api.Games;
 using Impostor.Api.Innersloth.Customization;
 using Impostor.Api.Net;
 using SusSuite.Core.Models;
-using SusSuite.Core.Services.Config;
 
 namespace SusSuite.Core.Services.PluginService
 {
     public class PluginService
     {
+        private readonly SusSuitePlugin _susSuitePlugin;
+        private readonly SusSuiteManager _susSuiteManager;
+        private readonly Dictionary<string, object> _data;
 
-        private readonly SusSuitePlugin SusSuitePlugin;
-
-        public PluginService(SusSuitePlugin susSuitePlugin)
+        public PluginService(SusSuitePlugin susSuitePlugin, SusSuiteManager susSuiteManager)
         {
-            SusSuitePlugin = susSuitePlugin;
+            _susSuitePlugin = susSuitePlugin;
+            _susSuiteManager = susSuiteManager;
+            _data = new Dictionary<string, object>();
+        }
+
+        public bool IsGameModeEnabled(IGame game)
+        {
+            return _susSuiteManager.PluginManager.IsGameModeEnabled(_susSuitePlugin, game);
+        }
+
+        public bool TryGetData<T>(IGame game, out T data)
+        {
+            data = default(T);
+
+            if (!_data.TryGetValue(game.Code, out var foundData)) return false;
+
+            try
+            {
+                data = (T)Convert.ChangeType(foundData, typeof(T));
+                return true;
+            }
+            catch (InvalidCastException)
+            {
+                return false;
+            }
+        }
+
+        public void SetData<T>(IGame game, T data)
+        {
+            _data[game.Code] = data;
         }
 
         public async Task SendMessageAsync(IGame game, params string[] messages)
@@ -26,7 +56,7 @@ namespace SusSuite.Core.Services.PluginService
             {
                 var name = game.Host.Character.PlayerInfo.PlayerName;
                 var message = string.Join("\n\n", messages);
-                await game.Host.Character.SetNameAsync(SusSuitePlugin.FormattedPluginName);
+                await game.Host.Character.SetNameAsync(_susSuitePlugin.FormattedPluginName);
                 await game.Host.Character.SendChatAsync(message);
                 await game.Host.Character.SetNameAsync(name);
             }
@@ -38,7 +68,7 @@ namespace SusSuite.Core.Services.PluginService
             {
                 var name = toPlayer.Character.PlayerInfo.PlayerName;
                 var message = string.Join("\n\n", messages);
-                await toPlayer.Character.SetNameAsync(SusSuitePlugin.FormattedPluginName);
+                await toPlayer.Character.SetNameAsync(_susSuitePlugin.FormattedPluginName);
                 await toPlayer.Character.SendChatToPlayerAsync(message);
                 await toPlayer.Character.SetNameAsync(name);
             }
@@ -65,7 +95,7 @@ namespace SusSuite.Core.Services.PluginService
                 {
                     game.Players.ToList().ForEach(async p =>
                     {
-                        if (p.Character != null) await p.Character.SetColorAsync((ColorType) r.Next(0, 6));
+                        if (p.Character != null) await p.Character.SetColorAsync((ColorType)r.Next(0, 6));
                     });
                     Thread.Sleep(1000);
                 }
