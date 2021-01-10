@@ -10,6 +10,21 @@ SusSuite is a library to help write [Impostor](https://github.com/Impostor/Impos
 - Easily find out if your game mode is active for a room.
 - Get and store data by room.
 - Load your configs from files with ease.
+- A fun way to end the game.
+
+## Chat Commands
+
+- /gamemode
+  - Displays the current game mode of a room
+- /gamemode {game mode name}
+  - Sets the room's game mode
+- /gamemodes
+  - Lists every game mode the server offers
+
+## Planned Features
+
+- [ ] More Customizable End Game Party
+- [ ] Plugin for Logging Events to File
 
 ## Support
 

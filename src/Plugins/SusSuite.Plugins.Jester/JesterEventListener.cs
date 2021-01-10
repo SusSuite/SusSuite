@@ -54,7 +54,7 @@ namespace SusSuite.Plugins.Jester
             new Task(async () =>
             {
                 System.Threading.Thread.Sleep(5000);
-                await _susSuiteCore.PluginService.SendPrivateMessageAsync(e.Game, jester, "pssst...", "You are the Jester", "Get Voted Out ;)");
+                await _susSuiteCore.PluginService.SendPrivateMessageAsync(jester, "pssst...", "You are the Jester", "Get Voted Out");
             }).Start();
         }
 

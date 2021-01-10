@@ -50,6 +50,12 @@ namespace SusSuite.Core.Services.PluginService
             _data[game.Code] = data;
         }
 
+        /// <summary>
+        /// Sends a public message with in-game chat to a game
+        /// </summary>
+        /// <param name="game">The game you want to send the message to</param>
+        /// <param name="messages">The message to send</param>
+        /// <returns></returns>
         public async Task SendMessageAsync(IGame game, params string[] messages)
         {
             if (game.Host.Character != null)
@@ -62,7 +68,13 @@ namespace SusSuite.Core.Services.PluginService
             }
         }
 
-        public async Task SendPrivateMessageAsync(IGame game, IClientPlayer toPlayer, params string[] messages)
+        /// <summary>
+        /// Sends a private message to a player with in-game chat
+        /// </summary>
+        /// <param name="toPlayer">The Player to receive the message</param>
+        /// <param name="messages">The message to send</param>
+        /// <returns></returns>
+        public async Task SendPrivateMessageAsync(IClientPlayer toPlayer, params string[] messages)
         {
             if (toPlayer.Character != null)
             {
@@ -74,6 +86,13 @@ namespace SusSuite.Core.Services.PluginService
             }
         }
 
+        /// <summary>
+        /// Provides a fun way to kill everyone and end the game.
+        /// </summary>
+        /// <param name="game">The IGame you want to end</param>
+        /// <param name="message">The win message</param>
+        /// <param name="timeToWait">How many milliseconds to wait before the celebration starts</param>
+        /// <param name="winType">Choose the default among us game over screen</param>
         public void EndGame(IGame game, string message, int timeToWait, WinType winType = WinType.CrewMate)
         {
             var aliveCrewMates = game.Players.Where(p => p.Character?.PlayerInfo.IsImpostor == false && !p.Character.PlayerInfo.IsDead).ToList();

@@ -69,13 +69,13 @@ namespace SusSuite.Core.Plugin
                                 }
                                 else
                                 {
-                                    await _susSuiteCore.PluginService.SendPrivateMessageAsync(e.Game, e.ClientPlayer, "Invalid Game Mode.", "Valid Game Modes: " + _susSuiteManager.PluginManager.GetGameModeList());
+                                    await _susSuiteCore.PluginService.SendPrivateMessageAsync(e.ClientPlayer, "Invalid Game Mode.", "Valid Game Modes: " + _susSuiteManager.PluginManager.GetGameModeList());
                                 }
                                 break;
 
                             default:
 
-                                await _susSuiteCore.PluginService.SendPrivateMessageAsync(e.Game, e.ClientPlayer, "Too Many Arguments.");
+                                await _susSuiteCore.PluginService.SendPrivateMessageAsync(e.ClientPlayer, "Too Many Arguments.");
                                 break;
                         }
                         break;

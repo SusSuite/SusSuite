@@ -99,6 +99,23 @@ _susSuiteCore.LoggerService.LogError(ex, "error");
 _susSuiteCore.LoggerService.Log(LogLevel.Information, "Hello");
 ```
 
+### Helpers
+
+Provide an easy way to send public and private room chat messages.  
+Every new parameter is a new line.  
+The message will appear to be coming a player with your plugin's name.
+
+```csharp
+_susSuiteCore.PluginService.SendMessageAsync(e.Game, "The Jester has been chosen!");
+_susSuiteCore.PluginService.SendPrivateMessageAsync(jester, "pssst...", "You are the Jester", "Get Voted Out");
+```
+
+Provides a fun way to end the game:
+
+```csharp
+_susSuiteCore.PluginService.EndGame(e.Game, "Jester Wins!", 11000, PluginService.WinType.Impostor);
+```
+
 ### Config
 
 SusSuite makes it easy getting data from json config files.
@@ -115,7 +132,7 @@ You can also pass in a name of a file, to find **\plugins\Jester\JesterAnotherCo
 var jesterConfig = _susSuiteCore.ConfigService.GetConfig<JesterConfig>("JesterAnotherConfig");
 ```
 
-### Validation
+#### Validation
 
 You can make sure your plugin will only run with a valid config:
 
