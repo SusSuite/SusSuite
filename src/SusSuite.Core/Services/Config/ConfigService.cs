@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Text.Json;
-using Microsoft.Extensions.Logging;
 using SusSuite.Core.Models;
 using SusSuite.Core.Services.Logger;
 

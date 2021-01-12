@@ -18,6 +18,9 @@ namespace SusSuite.Core.Models
             // Don't pass in options when recursively calling Deserialize.
             var susSuiteConfig = JsonSerializer.Deserialize<SusSuiteConfig>(ref reader);
 
+
+            if(susSuiteConfig == null) throw new JsonException("SusSuiteConfig is null.");
+
             var rx = new Regex(@"\[[0-9a-fA-F]{8}\]");
 
             if (!rx.IsMatch(susSuiteConfig.ServerColor)) throw new JsonException("ServerColor is not in proper format.");

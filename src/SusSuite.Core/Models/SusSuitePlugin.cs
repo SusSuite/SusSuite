@@ -1,7 +1,4 @@
-﻿using SusSuite.Core.Services.Config;
-using SusSuite.Core.Services.Logger;
-
-namespace SusSuite.Core.Models
+﻿namespace SusSuite.Core.Models
 {
     public class SusSuitePlugin
     {

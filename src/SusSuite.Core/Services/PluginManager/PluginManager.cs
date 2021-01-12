@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using Impostor.Api.Games;
-using Microsoft.Extensions.Logging;
 using SusSuite.Core.Models;
-using SusSuite.Core.Services.Config;
 using SusSuite.Core.Services.Logger;
 
 namespace SusSuite.Core.Services.PluginManager
@@ -52,14 +50,14 @@ namespace SusSuite.Core.Services.PluginManager
 
         public bool UnRegisterPlugin(SusSuitePlugin susSuitePlugin)
         {
-            if (TryGetPlugin(susSuitePlugin.Name, out var FoundSusSuitePlugin))
+            if (TryGetPlugin(susSuitePlugin.Name, out var foundSusSuitePlugin))
             {
                 LoggerService.LogInformation("Un-Registered {0}.", susSuitePlugin.Name);
                 SusSuitePlugins.Remove(susSuitePlugin);
                 return true;
             }
 
-            LoggerService.LogWarning("Could not un-register {0} | {1}.", FoundSusSuitePlugin.Name, "Not Found");
+            LoggerService.LogWarning("Could not un-register {0} | {1}.", foundSusSuitePlugin.Name, "Not Found");
             return false;
         }
 

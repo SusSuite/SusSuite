@@ -55,7 +55,7 @@ namespace SusSuite.Core.Services.PluginService
         /// </summary>
         /// <param name="game">The game you want to send the message to</param>
         /// <param name="messages">The message to send</param>
-        /// <returns></returns>
+         /// <returns></returns>
         public async Task SendMessageAsync(IGame game, params string[] messages)
         {
             if (game.Host.Character != null)

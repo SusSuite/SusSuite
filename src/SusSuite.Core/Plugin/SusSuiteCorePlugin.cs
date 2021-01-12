@@ -1,10 +1,8 @@
-﻿using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Impostor.Api.Events;
 using Impostor.Api.Plugins;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using SusSuite.Core.Models;
 
 namespace SusSuite.Core.Plugin
 {
