@@ -7,6 +7,7 @@ using Impostor.Api.Events.Player;
 using Impostor.Api.Innersloth.Customization;
 using SusSuite.Core;
 using SusSuite.Core.Services.PluginService;
+using SusSuite.Plugins.TeamSpeedRun.Models;
 
 namespace SusSuite.Plugins.TeamSpeedRun
 {
@@ -98,18 +99,5 @@ namespace SusSuite.Plugins.TeamSpeedRun
 
             }).Start();
         }
-    }
-
-    public class SpeedRunData
-    {
-        public SpeedRunTeam RedTeam { get; set; } = new();
-        public SpeedRunTeam BlueTeam { get; set; } = new();
-    }
-
-    public class SpeedRunTeam
-    {
-        public List<int> TeamPlayers { get; set; } = new();
-        public int TotalTasks { get; set; }
-        public int TasksDone { get; set; }
     }
 }
