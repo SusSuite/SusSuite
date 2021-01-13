@@ -25,6 +25,7 @@ SusSuite is a library to help write [Impostor](https://github.com/Impostor/Impos
 
 - [ ] More Customizable End Game Party
 - [ ] Plugin for Logging Events to File
+- [ ] Bad Manners Kicking
 
 ## Support
 
