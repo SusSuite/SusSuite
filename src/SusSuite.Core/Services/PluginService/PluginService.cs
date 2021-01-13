@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 using Impostor.Api.Games;
@@ -30,24 +31,18 @@ namespace SusSuite.Core.Services.PluginService
 
         public bool TryGetData<T>(IGame game, out T data)
         {
-            data = default(T);
-
-            if (!_data.TryGetValue(game.Code, out var foundData)) return false;
-
-            try
+            if (_susSuiteManager.PluginManager.TryGetGameData<T>(game, out var output))
             {
-                data = (T)Convert.ChangeType(foundData, typeof(T));
+                data = output;
                 return true;
             }
-            catch (InvalidCastException)
-            {
-                return false;
-            }
+            data = default;
+            return false;
         }
 
         public void SetData<T>(IGame game, T data)
         {
-            _data[game.Code] = data;
+            _susSuiteManager.PluginManager.SetGameData(game, data);
         }
 
         /// <summary>
@@ -93,7 +88,7 @@ namespace SusSuite.Core.Services.PluginService
         /// <param name="message">The win message</param>
         /// <param name="timeToWait">How many milliseconds to wait before the celebration starts</param>
         /// <param name="winType">Choose the default among us game over screen</param>
-        public void EndGame(IGame game, string message, int timeToWait, WinType winType = WinType.CrewMate)
+        public void EndGame(IGame game, string message, int timeToWait, WinType winType = WinType.CrewMate, Vector2 snapTo = default)
         {
             var aliveCrewMates = game.Players.Where(p => p.Character?.PlayerInfo.IsImpostor == false && !p.Character.PlayerInfo.IsDead).ToList();
             var aliveImpostors = game.Players.Where(p => p.Character?.PlayerInfo.IsImpostor == true && !p.Character.PlayerInfo.IsDead).ToList();
@@ -107,6 +102,10 @@ namespace SusSuite.Core.Services.PluginService
                     if (p.Character == null) return;
                     await p.Character.SetNameAsync(message);
                     await p.Character.SetHatAsync(HatType.PartyHat);
+                    if (snapTo != default)
+                    {
+                        await p.Character.NetworkTransform.SnapToAsync(snapTo);
+                    }
                 });
 
                 var r = new Random();

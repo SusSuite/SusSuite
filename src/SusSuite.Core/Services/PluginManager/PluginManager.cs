@@ -77,6 +77,26 @@ namespace SusSuite.Core.Services.PluginManager
             }
         }
 
+        internal bool SetGameData(IGame game, object data)
+        {
+            if (TryGetGame(game.Code, out var gameObject))
+            {
+                gameObject.SetData(data);
+            }
+            return false;
+        }
+        internal bool TryGetGameData<T>(IGame game, out T data)
+        {
+            data = default;
+
+            if (!TryGetGame(game.Code, out var gameObject)) return false;
+
+            if (!gameObject.TryGetData<T>(out var output)) return false;
+
+            data = output;
+            return true;
+        }
+
         internal void CreateGame(string gameCode)
         {
             TryGetPlugin("Normal", out var susSuitePlugin);
@@ -114,7 +134,6 @@ namespace SusSuite.Core.Services.PluginManager
 
         public bool TryGetGame(string gameCode, out SusSuiteGame susSuiteGame)
         {
-
             if (SusSuiteGames.Any(g => string.Equals(g.GameCode, gameCode, StringComparison.CurrentCultureIgnoreCase)))
             {
                 susSuiteGame = SusSuiteGames.First(g => string.Equals(g.GameCode, gameCode, StringComparison.CurrentCultureIgnoreCase));

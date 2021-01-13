@@ -20,7 +20,8 @@ namespace SusSuite.Core
         {
             var susPlugin = new SusSuitePlugin()
             {
-                Name = "SusSuite"
+                Name = "SusSuite",
+                PluginType = PluginType.Extra
             };
 
             Logger = logger;
