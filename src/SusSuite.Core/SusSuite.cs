@@ -36,7 +36,8 @@ namespace SusSuite.Core
             ServerPlugin = new SusSuitePlugin()
             {
                 Name = serverConfig.ServerName,
-                PluginColor = serverConfig.ServerColor
+                PluginColor = serverConfig.ServerColor,
+                PluginType = PluginType.Extra
             };
         }
 
