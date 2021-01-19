@@ -12,7 +12,7 @@ pool:
 variables: 
 - group: 'SusSuite'
 - name: major
-  value: A
+  value: B
 - name: minor
   value: $[counter(variables['major'], 0)]
 
