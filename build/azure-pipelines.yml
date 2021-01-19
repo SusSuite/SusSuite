@@ -12,7 +12,7 @@ pool:
 variables: 
 - group: 'SusSuite'
 - name: major
-  value: B
+  value: 100
 - name: minor
   value: $[counter(variables['major'], 0)]
 
@@ -44,7 +44,7 @@ steps:
   - task: DotNetCoreCLI@2
     inputs:
       command: 'pack'
-      packagesToPack: '**/*.csproj'
+      packagesToPack: '**/SusSuite.Core.csproj'
       nobuild: true
       includesymbols: true
       includesource: true
