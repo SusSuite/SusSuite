@@ -14,11 +14,13 @@ variables:
 - name: major
   value: 100
 - name: minor
-  value: $[counter(variables['major'], 0)]
+  value: 1
+- name: patch
+  value: $[counter(variables['minor'], 0)]
 
 steps:
   - bash: |
-      echo "##vso[task.setvariable variable=version]$(major).$(minor)-PreRelease"
+      echo "##vso[task.setvariable variable=version]$(major).$(minor).$(patch)-PreRelease"
   - task: UseDotNet@2
     inputs:
       packageType: 'sdk'
