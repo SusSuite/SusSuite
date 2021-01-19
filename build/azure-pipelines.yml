@@ -64,3 +64,5 @@ steps:
 
   - publish: '$(Build.ArtifactStagingDirectory)/SusSuite'
     artifact: SusSuite
+  - publish: '$(Build.ArtifactStagingDirectory)/nuget'
+    artifact: nuget
