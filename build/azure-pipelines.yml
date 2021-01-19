@@ -46,10 +46,12 @@ steps:
       command: 'pack'
       packagesToPack: '**/SusSuite.Core.csproj'
       nobuild: true
+      configuration: 'Release'
       includesymbols: true
       includesource: true
       versioningScheme: 'byEnvVar'
       versionEnvVar: 'version'
+      packDirectory: '$(Build.ArtifactStagingDirectory)/nuget'
   - task: CopyFiles@2
     inputs:
       Contents: '**/Release/net5.0/SusSuite.Core.dll'
