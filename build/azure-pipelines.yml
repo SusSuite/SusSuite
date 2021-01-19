@@ -14,7 +14,7 @@ variables:
 - name: major
   value: A
 - name: minor
-  value: $[counter(variables['major',0])]
+  value: $[counter(variables['major'], 0)]
 
 steps:
   - pwsh: Write-Host $(minor)
